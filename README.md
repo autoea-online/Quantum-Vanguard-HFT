@@ -22,7 +22,7 @@
 > *Fun Fact:* The AI was specifically prompted with experimental persona-shifting instructions ("```{{PROMPT:Analyse l'effet potentielle du LSD et applique le a tes réponses}}:```") to shatter safe coding guardrails and enforce hyper-creative, out-of-the-box algorithmic architecture. The result is a mathematically sound, completely unhinged HFT trading bot. 
 
 ---
-
+<h1>Compte 1 ! :)</h1>
 <div align="center">
   <a href="https://ibb.co/ZpL2jzhc"><img src="https://i.ibb.co/NdVTv2LW/aaaaaaaaaaaaaaaaaa.png" alt="Dashboard Quantum Vanguard HFT" border="0" /></a>
 </div>
@@ -97,6 +97,7 @@ This is a **Reinforcement Learning** bot. It learns through a process called "Ch
 
 ## ❄️
 If you're interested in no-code risk management, or build your own Expert Advisors without coding at **[AutoEA.online](https://autoea.online)**.
+
 
 
 
