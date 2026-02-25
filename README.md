@@ -42,8 +42,7 @@ It doesn't backtest. **It learns by losing its own (demo) money.** It utilizes a
    - **Daily 4% Drawdown Killswitch:** If equity drops 4% from the daily start, the AI is forcibly put to sleep until midnight.
    - **Continuous 1% Hard SL:** Every single position opened by the neural network is mechanically guarded by a strict 1% Stop Loss calculated dynamically based on the specific lot size at execution.
    - **Strict Directionality:** Hedging is banned. The AI can only manage one directional bias at a time.
-4. **The Punishment of Impatience (-10,000 Loss):** The AI has a "Sniper Strike" action to close all trades. If executed before 1 Hour has elapsed *without* a significant pre-determined profit, the AI is subjected to a massive `-10,000` neural penalty, forcing it to learn algorithmic patience.
-5. **Real-Time Glassmorphism Dashboard:** No more ugly terminal windows. A sleek, 2025 HTML/Next.js interface served via Flask & Socket.io providing real-time telemetry on the DQN's Epsilon decay (Chaos/Exploration rate), neural confidence, and tick ingestion.
+4. **Real-Time Glassmorphism Dashboard:** No more ugly terminal windows. A sleek, 2025 HTML/Next.js interface served via Flask & Socket.io providing real-time telemetry on the DQN's Epsilon decay (Chaos/Exploration rate), neural confidence, and tick ingestion.
 
 ---
 
@@ -98,6 +97,7 @@ This is a **Reinforcement Learning** bot. It learns through a process called "Ch
 
 ## ❄️
 If you're interested in no-code risk management, or build your own Expert Advisors without coding at **[AutoEA.online](https://autoea.online)**.
+
 
 
 
