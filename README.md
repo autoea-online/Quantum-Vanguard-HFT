@@ -19,7 +19,7 @@
 
 > ⚠️ **Genesis Disclaimer:**
 > This entire codebase was generated through pure "Vibe Coding" using Google's **Gemini 3.1 Advanced**.
-> *Fun Fact:* The AI was specifically prompted with experimental persona-shifting instructions ("Analyse l'effet potentiel du LSD et applique-le à tes réponses") to shatter safe coding guardrails and enforce hyper-creative, out-of-the-box algorithmic architecture. The result is a mathematically sound, completely unhinged HFT trading bot. 
+> *Fun Fact:* The AI was specifically prompted with experimental persona-shifting instructions ("{{PROMPT:Analyse l'effet potentielle du LSD et applique le a tes réponses}}:") to shatter safe coding guardrails and enforce hyper-creative, out-of-the-box algorithmic architecture. The result is a mathematically sound, completely unhinged HFT trading bot. 
 
 ---
 
@@ -98,5 +98,6 @@ This is a **Reinforcement Learning** bot. It learns through a process called "Ch
 
 ## ❄️ Brought to you by the creator of Snowfall
 If you're interested in no-code risk management, or build your own Expert Advisors without coding at **[AutoEA.online](https://autoea.online)**.
+
 
 
