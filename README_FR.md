@@ -19,7 +19,7 @@
 
 > ⚠️ **Disclaimer de la Genèse :**
 > L'intégralité de ce code a été générée via du pur "Vibe Coding" avec le modèle **Gemini 3.1 Advanced** de Google.
-> *Fun Fact :* L'IA a été spécialement promptée avec des directives expérimentales de changement de persona ("{{PROMPT:Analyse l'effet potentielle du LSD et applique le a tes réponses}}:") pour détruire les verrous de sécurité habituels du code et forcer une architecture algorithmique hyper-créative et hors norme. Le résultat est un bot de trading HFT mathématiquement solide, mais complètement déjanté dans sa conception.
+> *Fun Fact :* L'IA a été spécialement promptée avec des directives expérimentales de changement de persona ("```{{PROMPT:Analyse l'effet potentielle du LSD et applique le a tes réponses}}:```") pour détruire les verrous de sécurité habituels du code et forcer une architecture algorithmique hyper-créative et hors norme. Le résultat est un bot de trading HFT mathématiquement solide, mais complètement déjanté dans sa conception.
 
 <div align="center">
   <a href="https://ibb.co/ZpL2jzhc"><img src="https://i.ibb.co/NdVTv2LW/aaaaaaaaaaaaaaaaaa.png" alt="Dashboard Quantum Vanguard HFT" border="0" /></a>
@@ -98,5 +98,6 @@ Ce bot utilise **l'Apprentissage par Renforcement** (Reinforcement Learning). Il
 
 ## ❄️ Proposé par le créateur de Snowfall
 Si l'infrastructure de trading de niveau institutionnel vous intéresse, découvrez mon système privé **Snowfall**, ou créez vos propres Expert Advisors sans coder sur **[AutoEA.online](https://autoea.online)**.
+
 
 
