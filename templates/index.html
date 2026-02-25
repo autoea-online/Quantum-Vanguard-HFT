@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Vanguard | Institutional AI</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        dark: '#0a0a0c',
+                        surface: '#121216',
+                        border: '#2a2a32',
+                        accent: {
+                            DEFAULT: '#3b82f6', // Blueprint blue
+                            hover: '#2563eb',
+                            glow: 'rgba(59, 130, 246, 0.5)'
+                        },
+                        success: { DEFAULT: '#10b981', hover: '#059669', bg: 'rgba(16, 185, 129, 0.1)' },
+                        danger: { DEFAULT: '#ef4444', hover: '#dc2626', bg: 'rgba(239, 68, 68, 0.1)' },
+                        warning: { DEFAULT: '#f59e0b', hover: '#d97706', bg: 'rgba(245, 158, 11, 0.1)' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0a0a0c;
+            color: #e2e8f0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: -1px -1px;
+            min-height: 100vh;
+        }
+
+        /* 2025 Glassmorphism */
+        .glass-panel {
+            background: rgba(18, 18, 22, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .data-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+        }
+
+        .status-offline {
+            background: theme('colors.danger.bg');
+            color: theme('colors.danger.DEFAULT');
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .status-online {
+            background: theme('colors.success.bg');
+            color: theme('colors.success.DEFAULT');
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+        }
+
+        .status-warning {
+            background: theme('colors.warning.bg');
+            color: theme('colors.warning.DEFAULT');
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .btn-modern {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .btn-modern:active {
+            transform: scale(0.97);
+        }
+
+        /* Shimmer effect for primary button */
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transform: skewX(-20deg);
+            animation: shimmer 4s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+
+            20% {
+                left: 200%;
+            }
+
+            100% {
+                left: 200%;
+            }
+        }
+
+        /* Ambient glows */
+        .ambient-glow-blue {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -100px;
+            left: 10%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .ambient-glow-purple {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: -150px;
+            right: 5%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3f3f4e;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4f4f60;
+        }
+
+        /* Table styling */
+        .table-row-hover {
+            transition: background-color 0.2s ease;
+        }
+
+        .table-row-hover:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+    </style>
+</head>
+
+<body class="p-4 md:p-8 flex flex-col items-center relative overflow-x-hidden">
+
+    <!-- Ambient Background Elements -->
+    <div class="ambient-glow-blue"></div>
+    <div class="ambient-glow-purple"></div>
+
+    <!-- Header -->
+    <header class="w-full max-w-7xl flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+        <div>
+            <div class="flex items-center gap-3 mb-1">
+                <div
+                    class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.4)]">
+                    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold tracking-tight text-white mb-0">Quantum Vanguard <span
+                        class="text-accent font-light">| AI</span></h1>
+            </div>
+            <p class="text-sm text-gray-400 font-mono tracking-wide flex items-center gap-2 ml-11">
+                INSTITUTIONAL NEURAL ROUTER
+            </p>
+        </div>
+        <button id="connexion-btn"
+            class="glass-panel btn-modern btn-primary px-6 py-3 bg-surface hover:bg-white/5 border border-accent/40 flex items-center gap-3 group"
+            onclick="connecterMT5()">
+            <div class="w-2 h-2 rounded-full bg-accent group-hover:animate-ping"></div>
+            <span
+                class="text-sm font-semibold tracking-wide text-white group-hover:text-accent transition-colors">INITIALIZE
+                TERMINAL</span>
+        </button>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+        <!-- Left Column: Settings & Overrides (Span 1) -->
+        <div class="lg:col-span-1 flex flex-col gap-6">
+
+            <!-- System Core -->
+            <div class="glass-panel p-6">
+                <div class="flex justify-between items-center mb-6 pb-3 border-b border-border/60">
+                    <h2 class="text-xs uppercase tracking-widest text-gray-400 font-semibold flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                        </svg>
+                        System Core
+                    </h2>
+                </div>
+
+                <div class="space-y-5">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-400">Status</span>
+                        <span id="etat-ia" class="status-badge status-offline">Offline</span>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-400">Network Error (Loss)</span>
+                        <span id="sagesse-ia" class="data-value text-white">0.0000</span>
+                    </div>
+
+                    <div class="flex flex-col gap-2 pt-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-gray-400 uppercase tracking-wider">Exploration (Epsilon)</span>
+                            <span id="chaos-val" class="data-value text-xs text-accent">20.0%</span>
+                        </div>
+                        <div class="w-full bg-surface/80 h-1.5 rounded-full overflow-hidden border border-border/50">
+                            <div id="chaos-bar"
+                                class="h-full bg-gradient-to-r from-blue-500 to-accent transition-all duration-300 relative"
+                                style="width: 20%;">
+                                <div class="absolute inset-0 bg-white/20 w-full animate-[shimmer_2s_infinite]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manual Overrides -->
+            <div class="glass-panel p-6">
+                <div class="flex justify-between items-center mb-6 pb-3 border-b border-border/60">
+                    <h2 class="text-xs uppercase tracking-widest text-gray-400 font-semibold flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        </svg>
+                        Manual Overrides
+                    </h2>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <div class="grid grid-cols-2 gap-3">
+                        <button
+                            class="btn-modern py-2.5 bg-surface border border-success/30 text-success hover:bg-success/10 font-semibold text-xs rounded-xl flex items-center justify-center gap-2"
+                            onclick="forcerAction('achat')">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                            LONG
+                        </button>
+                        <button
+                            class="btn-modern py-2.5 bg-surface border border-danger/30 text-danger hover:bg-danger/10 font-semibold text-xs rounded-xl flex items-center justify-center gap-2"
+                            onclick="forcerAction('vente')">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+                            </svg>
+                            SHORT
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Center & Right Columns: Metrics, Stream, Positions (Span 3) -->
+        <div class="lg:col-span-3 flex flex-col gap-6">
+
+            <!-- Account Metrics -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="glass-panel p-5 flex flex-col justify-center relative overflow-hidden group">
+                    <div
+                        class="absolute right-0 top-0 w-16 h-16 bg-white/5 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110">
+                    </div>
+                    <span class="text-xs text-gray-500 uppercase tracking-widest font-medium mb-1">Balance</span>
+                    <span id="acc-balance" class="data-value text-2xl text-white">---</span>
+                </div>
+                <div class="glass-panel p-5 flex flex-col justify-center relative overflow-hidden group">
+                    <div
+                        class="absolute right-0 top-0 w-16 h-16 bg-white/5 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110">
+                    </div>
+                    <span class="text-xs text-gray-500 uppercase tracking-widest font-medium mb-1">Equity</span>
+                    <span id="acc-equity" class="data-value text-2xl text-white">---</span>
+                </div>
+                <div class="glass-panel p-5 flex flex-col justify-center">
+                    <span class="text-xs text-gray-500 uppercase tracking-widest font-medium mb-1">Used Margin</span>
+                    <span id="acc-margin" class="data-value text-xl text-gray-300">---</span>
+                </div>
+                <div class="glass-panel p-5 flex flex-col justify-center">
+                    <span class="text-xs text-gray-500 uppercase tracking-widest font-medium mb-1">Free Margin</span>
+                    <span id="acc-free" class="data-value text-xl text-white">---</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow">
+                <!-- Matrix Stream (Ticks) - Span 1 -->
+                <div class="glass-panel p-0 flex flex-col lg:col-span-1 h-[400px]">
+                    <div
+                        class="p-5 border-b border-border/60 flex justify-between items-center bg-surface/30 rounded-t-2xl">
+                        <h2
+                            class="text-xs uppercase tracking-widest text-gray-400 font-semibold flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Data Stream
+                        </h2>
+                        <span class="flex h-2 w-2 relative">
+                            <span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+                        </span>
+                    </div>
+
+                    <div id="div-vibrations" class="flex-grow overflow-y-auto font-mono text-xs p-3 space-y-1">
+                        <div class="text-gray-500 text-center mt-32 font-sans text-sm">Awaiting MT5 Initialization...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Positions - Span 2 -->
+                <div class="glass-panel p-0 flex flex-col lg:col-span-2 h-[400px]">
+                    <div
+                        class="p-5 border-b border-border/60 flex justify-between items-center bg-surface/30 rounded-t-2xl">
+                        <h2
+                            class="text-xs uppercase tracking-widest text-gray-400 font-semibold flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            Active Portfolio
+                        </h2>
+                        <span id="pos-count"
+                            class="text-xs font-mono bg-border/50 px-2.5 py-1 rounded-md text-gray-300 border border-border">0
+                            OPEN</span>
+                    </div>
+
+                    <div class="overflow-x-auto overflow-y-auto flex-grow">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="sticky top-0 bg-[#121216]/95 backdrop-blur z-10 border-b border-border/50">
+                                <tr class="text-[10px] text-gray-500 uppercase tracking-widest">
+                                    <th class="py-3 px-4 font-semibold">Ticket</th>
+                                    <th class="py-3 px-4 font-semibold">Asset</th>
+                                    <th class="py-3 px-4 font-semibold">Side</th>
+                                    <th class="py-3 px-4 font-semibold text-right">Size</th>
+                                    <th class="py-3 px-4 font-semibold text-right">Entry</th>
+                                    <th class="py-3 px-4 font-semibold text-right">Current</th>
+                                    <th class="py-3 px-4 font-semibold text-right">PnL (USD)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="div-positions" class="text-sm font-mono text-gray-300">
+                                <tr>
+                                    <td colspan="7" class="text-center py-20 text-gray-500 font-sans text-sm">No active
+                                        positions.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const socket = io();
+        let connected = false;
+
+        socket.on('aura_update', function (data) {
+            // Update State
+            const stateEl = document.getElementById('etat-ia');
+            stateEl.textContent = data.etat;
+
+            if (data.etat.includes("Endormi") || data.etat.includes("Échec")) {
+                stateEl.className = "status-badge status-offline";
+            } else if (data.etat.includes("Guérison") || data.etat.includes("Drawdown")) {
+                stateEl.className = "status-badge status-warning animate-pulse";
+            } else {
+                stateEl.className = "status-badge status-online";
+                if (!connected) {
+                    document.getElementById('connexion-btn').classList.add('hidden');
+                    connected = true;
+                }
+            }
+
+            // Core Metrics
+            document.getElementById('sagesse-ia').textContent = data.sagesse.toFixed(4);
+
+            let chaos = data.chaos * 100;
+            document.getElementById('chaos-val').textContent = chaos.toFixed(1) + "%";
+            document.getElementById('chaos-bar').style.width = chaos + "%";
+
+            // Account Updates
+            if (data.account && data.account.balance !== "Inconnue") {
+                const formatCurrency = (val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
+
+                document.getElementById('acc-balance').textContent = formatCurrency(data.account.balance);
+
+                let eqEl = document.getElementById('acc-equity');
+                eqEl.textContent = formatCurrency(data.account.equity);
+
+                if (parseFloat(data.account.equity) < parseFloat(data.account.balance)) {
+                    eqEl.classList.remove('text-white', 'text-success.DEFAULT');
+                    eqEl.classList.add('text-danger');
+                } else if (parseFloat(data.account.equity) > parseFloat(data.account.balance)) {
+                    eqEl.classList.remove('text-white', 'text-danger');
+                    eqEl.classList.add('text-success');
+                } else {
+                    eqEl.classList.remove('text-success', 'text-danger');
+                    eqEl.classList.add('text-white');
+                }
+
+                document.getElementById('acc-margin').textContent = formatCurrency(data.account.margin);
+                document.getElementById('acc-free').textContent = formatCurrency(data.account.free_margin);
+            }
+
+            // Data Stream Updates
+            const vp = document.getElementById('div-vibrations');
+            vp.innerHTML = '';
+            let startIndex = Math.max(0, data.vibrations.length - 20);
+            for (let i = data.vibrations.length - 1; i >= startIndex; i--) {
+                let v = data.vibrations[i];
+                let bgClass = i % 2 === 0 ? "bg-surface/40" : "bg-transparent";
+
+                vp.innerHTML += `
+                    <div class="flex justify-between items-center ${bgClass} px-3 py-1.5 rounded-md hover:bg-surface/80 transition-colors">
+                        <span class="text-gray-500 text-[10px]">#${v.id}</span>
+                        <span class="text-white font-medium">${v.symbole}</span>
+                        <span class="text-gray-400">A:<span class="text-white ml-1">${v.prix.toFixed(5)}</span></span>
+                    </div>
+                `;
+            }
+
+            // Active Positions Update
+            const positionsDiv = document.getElementById('div-positions');
+            document.getElementById('pos-count').textContent = data.positions_ouvertes.length + " OPEN";
+
+            if (data.positions_ouvertes.length === 0) {
+                positionsDiv.innerHTML = `<tr><td colspan="7" class="text-center py-20 text-gray-500 font-sans text-sm">No active positions.</td></tr>`;
+            } else {
+                positionsDiv.innerHTML = '';
+                data.positions_ouvertes.forEach(p => {
+                    let profVal = parseFloat(p.profit);
+                    let profClass = profVal > 0 ? 'text-success bg-success/10' : (profVal < 0 ? 'text-danger bg-danger/10' : 'text-gray-400');
+                    let profSign = profVal > 0 ? '+' : '';
+
+                    let isBuy = p.type.toLowerCase().includes('achat');
+                    let typeColor = isBuy ? 'text-success' : 'text-danger';
+                    let typeLabel = isBuy ? 'LONG' : 'SHORT';
+                    if (p.type.includes('Défensé')) typeLabel += ' (BE)';
+
+                    positionsDiv.innerHTML += `
+                        <tr class="table-row-hover border-b border-border/30 last:border-0">
+                            <td class="py-3 px-4 text-gray-500 text-xs">#${p.ticket}</td>
+                            <td class="py-3 px-4 text-white font-medium">${p.symbole}</td>
+                            <td class="py-3 px-4 font-bold text-xs ${typeColor}">${typeLabel}</td>
+                            <td class="py-3 px-4 text-right text-white">${parseFloat(p.volume).toFixed(2)}</td>
+                            <td class="py-3 px-4 text-right text-gray-400">${parseFloat(p.open_price).toFixed(5)}</td>
+                            <td class="py-3 px-4 text-right text-white">${parseFloat(p.current_price).toFixed(5)}</td>
+                            <td class="py-3 px-4 text-right">
+                                <span class="px-2 py-1 rounded inline-block min-w-[70px] font-bold ${profClass}">
+                                    ${profSign}${profVal.toFixed(2)}
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        });
+
+        function connecterMT5() {
+            const btn = document.getElementById('connexion-btn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<span class="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full"></span> CONNECTING...';
+
+            fetch('/api/connect')
+                .then(r => r.json())
+                .then(d => {
+                    console.log(d.message);
+                    if (d.status !== "success") {
+                        btn.innerHTML = originalContent; // Reset if failed
+                    }
+                })
+                .catch(e => {
+                    btn.innerHTML = originalContent;
+                });
+        }
+
+        function forcerAction(dir) {
+            fetch('/api/materialiser/' + dir)
+                .then(r => r.json())
+                .then(d => alert("Override Status: " + d.message));
+        }
+    </script>
+</body>
+
+</html>
