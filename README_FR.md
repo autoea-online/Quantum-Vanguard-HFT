@@ -56,7 +56,7 @@ Il ne fait pas de backtest. **Il apprend en perdant son propre argent (sur compt
 
 ### 1. Cloner & Préparer l'Environnement
 ```bash
-git clone https://github.com/votre_pseudo/quantum-vanguard-hft.git
+git clone https://github.com/autoea-online/-FUN-Deep-Reinforcement-Learning-Trading-Bot-PyTorch-x-MetaTrader-5-web-interface-.git
 cd quantum-vanguard-hft
 pip install -r requirements.txt
 ```
@@ -98,4 +98,5 @@ Ce bot utilise **l'Apprentissage par Renforcement** (Reinforcement Learning). Il
 
 ## ❄️ Proposé par le créateur de Snowfall
 Si l'infrastructure de trading de niveau institutionnel vous intéresse, découvrez mon système privé **Snowfall**, ou créez vos propres Expert Advisors sans coder sur **[AutoEA.online](https://autoea.online)**.
+
 
